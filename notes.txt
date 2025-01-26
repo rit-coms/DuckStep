@@ -1,0 +1,13 @@
+6 lanes
+
+lane buttons (in order): 
+Left_Left Left_down Left_right Y B A
+(this is left/right buttons w/out top most button)
+
+logistical buttons
+pause - upper left and upper right (?)
+menu options - left+right upper buttons (?)
+
+notes:
+csv?
+[ lane_num, note_height, ]
