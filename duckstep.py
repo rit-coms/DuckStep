@@ -8,17 +8,34 @@ pygame.joystick.init() #interact w controller
 clock = pygame.time.Clock()
 
 # Creates game screen
-screen = pygame.display.set_mode((800, 600))
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# constants prob go here
+# constants go here 
+# (lane config)
+LANE_WIDTH = SCREEN_WIDTH // 6
+NOTE_HEIGHT = 20
+# (player variables)
+playerX, playerY = 400, 300  # Initial player position
+playerX_change, playerY_change = 0, 0
 
+# Placeholder for notes (lane_num, y_position); gonna make csv later
+notes = [
+    [0, 100], [1, 200], [2, 300], [3, 400], [4, 500], [5, 600]
+]
 
 # def draw methods to draw stuff on to the screen
 def draw_board():
-    pass
+    """Draws the six lanes on the screen."""
+    for i in range(1, 6):
+        pygame.draw.line(screen, (255, 255, 255), (i * LANE_WIDTH, 0), (i * LANE_WIDTH, SCREEN_HEIGHT), 2)
 
 def draw_notes():
-    pass
+    """Draws falling notes on the screen."""
+    for note in notes:
+        lane, y_pos = note
+        pygame.draw.rect(screen, (255, 0, 0), (lane * LANE_WIDTH + 10, y_pos, LANE_WIDTH - 20, NOTE_HEIGHT))
+        note[1] += 5  # Move notes downward
 
 # game go brr
 running = True # infinite loop
@@ -31,57 +48,50 @@ while running:
 
         # is controller pluged in
         if event.type == pygame.JOYDEVICEADDED:
-            print("Controller connected: " + str(event))
             joy = pygame.joystick.Joystick(event.device_index)
-            
-            # start seeing what button is which
-            buttons = joy.get_numbuttons()
-            print(screen, f"Number of buttons: {buttons}")
-
-            for i in range(buttons):
-                button = joy.get_button(i)
-                print(screen, f"Button {i:>2} value: {button}")
-            print(str(joy.get_name()))
+            joy.init()
+            print(f"Controller connected: {joy.get_name()}")
+            print(f"Number of buttons: {joy.get_numbuttons()}")
             # done
 
         # movement with controller buttons
         if event.type == pygame.JOYBUTTONDOWN:
-            print(event)
-            # X button
-            if event.button == 0:
+            if event.button == 0:  # X button
                 playerY_change = -5
-            # A button
-            if event.button == 1:
+            if event.button == 1:  # A button
                 playerX_change = 5
-            # B button
-            if event.button == 2:
+            if event.button == 2:  # B button
                 playerY_change = 5
-            # Y button
-            if event.button == 3:
+            if event.button == 3:  # Y button
                 playerX_change = -5
-            # select button
-            if event.button == 8:
+            if event.button == 8:  # Select button
                 running = False
 
         # Stops continuous movement when button is lifted (Controller)
         if event.type == pygame.JOYBUTTONUP:
-            if event.button == 0 or event.button == 2:
+            if event.button in [0, 2]:
                 playerY_change = 0
-            if event.button == 1 or event.button == 3:
+            if event.button in [1, 3]:
                 playerX_change = 0
 
 
         # D-pad Controls (Goofy setup)
         if event.type == pygame.JOYAXISMOTION:
             print(event)
-            if event.axis == 1 and event.value == 1:
-                playerX_change = 5
-            if event.axis == 1 and event.value <= -1:
-                playerX_change = -5
-            if event.axis == 4 and event.value == 1:
-                playerY_change = 5
-            if event.axis == 4 and event.value <= -1:
-                playerY_change = -5
+            if event.axis == 0:  # Left/Right movement
+                if event.value < -0.5:
+                    playerX_change = -5
+                elif event.value > 0.5:
+                    playerX_change = 5
+                else:
+                    playerX_change = 0
+            if event.axis == 1:  # Up/Down movement
+                if event.value < -0.5:
+                    playerY_change = -5
+                elif event.value > 0.5:
+                    playerY_change = 5
+                else:
+                    playerY_change = 0
 
         # Keyboard controls
         if event.type == pygame.KEYDOWN:
@@ -96,9 +106,9 @@ while running:
 
         # Stops continuous movement when button is lifted (Keyboard)
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+            if event.key in [pygame.K_UP, pygame.K_DOWN]:
                 playerY_change = 0
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
+            if event.key in [pygame.K_RIGHT, pygame.K_LEFT]:
                 playerX_change = 0
 
     # Changes player position 
@@ -106,17 +116,14 @@ while running:
     playerY += playerY_change
 
     # Game bounds 
-    if playerX <= 0:
-        playerX = 0
-    elif playerX >= 768:
-        playerX = 768
-
-    if playerY <= 0:
-        playerY = 0
-    elif playerY >= 568:
-        playerY = 568
+    playerX = max(0, min(768, playerX))
+    playerY = max(0, min(568, playerY))
 
     # draw methods here
+    draw_board()
+    draw_notes()
+
+    # update gui
     pygame.display.update()
     # Framerate 60 fps
     clock.tick(60)
