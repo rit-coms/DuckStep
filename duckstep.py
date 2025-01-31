@@ -1,7 +1,6 @@
 import pygame
 
 pygame.init() # init pygame
-
 pygame.joystick.init() #interact w controller
 
 # Game clock for framerate
@@ -24,9 +23,31 @@ playerX_change, playerY_change = 0, 0
 
 # Placeholder for notes (lane_num, y_position); gonna make csv later
 notes = [
-    [i % 6, -NOTE_HEIGHT * i*5] for i in range(50)
-    # [0, 100], [1, 200], [2, 300], [3, 400], [4, 500], [5, 600]
+    # [i % 6, -NOTE_HEIGHT * i*5] for i in range(50)
+    [0, -100], [1, -200], [2, -300], [3, -400], [4, -500], [5, -600],
+    [0, -700], [1, -800], [2, -900], [3, -1000], [4, -1100], [5, -1200]
 ]
+score = 0
+
+# lanes - keyboard binds
+key_to_lane = {
+    pygame.K_s: 0,
+    pygame.K_d: 1,
+    pygame.K_f: 2,
+    pygame.K_j: 3,
+    pygame.K_k: 4,
+    pygame.K_l: 5,
+}
+
+# lanes - snes controller binds
+snes_button_to_lane = {
+    13: 0, # Left on D-pad
+    12: 1, # Down on D-pad
+    14: 2, # Right on D-pad
+    3: 3, # Y button
+    1: 4, # B button
+    0: 5, # A button
+}
 
 # def draw methods to draw stuff on to the screen
 def draw_board():
@@ -36,10 +57,25 @@ def draw_board():
 
 def draw_notes():
     """Draws falling notes on the screen."""
+    global notes
     for note in notes:
         lane, y_pos = note
         screen.blit(bread_image, (lane * LANE_WIDTH + 10, y_pos))
+    # move notes down
+    for note in notes:
         note[1] += 5  # Move notes downward
+    # remove notes that go off the screen
+    notes = [note for note in notes if note[1] < SCREEN_HEIGHT]
+
+def check_hit(lane):
+    """Checks if there is a note at the bottom of the screen in the given lane."""
+    global notes, score
+    for note in notes:
+        if note[0] == lane and SCREEN_HEIGHT - NOTE_HEIGHT - 5 <= note[1] <= SCREEN_HEIGHT:
+            notes.remove(note)
+            score += 1
+            print(f"Score: {score}")
+            return
 
 # game go brr
 running = True # infinite loop
@@ -50,84 +86,19 @@ while running:
         if event.type == pygame.QUIT:
             running = False # exit game
 
-        # is controller pluged in
-        if event.type == pygame.JOYDEVICEADDED:
-            joy = pygame.joystick.Joystick(event.device_index)
-            joy.init()
-            print(f"Controller connected: {joy.get_name()}")
-            print(f"Number of buttons: {joy.get_numbuttons()}")
-            # done
-
-        # movement with controller buttons
-        if event.type == pygame.JOYBUTTONDOWN:
-            if event.button == 0:  # X button
-                playerY_change = -5
-            if event.button == 1:  # A button
-                playerX_change = 5
-            if event.button == 2:  # B button
-                playerY_change = 5
-            if event.button == 3:  # Y button
-                playerX_change = -5
-            if event.button == 8:  # Select button
-                running = False
-
-        # Stops continuous movement when button is lifted (Controller)
-        if event.type == pygame.JOYBUTTONUP:
-            if event.button in [0, 2]:
-                playerY_change = 0
-            if event.button in [1, 3]:
-                playerX_change = 0
-
-
-        # D-pad Controls (Goofy setup)
-        if event.type == pygame.JOYAXISMOTION:
-            print("goofy", event)
-            if event.axis == 0:  # Left/Right movement
-                if event.value < -0.5:
-                    playerX_change = -5
-                elif event.value > 0.5:
-                    playerX_change = 5
-                else:
-                    playerX_change = 0
-            if event.axis == 1:  # Up/Down movement
-                if event.value < -0.5:
-                    playerY_change = -5
-                elif event.value > 0.5:
-                    playerY_change = 5
-                else:
-                    playerY_change = 0
-
-        # Keyboard controls
+        # Keyboard controls for hitting notes
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                playerY_change = -5
-            if event.key == pygame.K_DOWN:
-                playerY_change = 5
-            if event.key == pygame.K_RIGHT:
-                playerX_change = 5
-            if event.key == pygame.K_LEFT:
-                playerX_change = -5
+            if event.key in key_to_lane:
+                check_hit(key_to_lane[event.key])
 
-        # Stops continuous movement when button is lifted (Keyboard)
-        if event.type == pygame.KEYUP:
-            if event.key in [pygame.K_UP, pygame.K_DOWN]:
-                playerY_change = 0
-            if event.key in [pygame.K_RIGHT, pygame.K_LEFT]:
-                playerX_change = 0
-
-    # Changes player position 
-    playerX += playerX_change
-    playerY += playerY_change
-
-    # Game bounds 
-    playerX = max(0, min(768, playerX))
-    playerY = max(0, min(568, playerY))
+        # SNES controller button press handling
+        if event.type == pygame.JOYBUTTONDOWN:
+            if event.button in snes_button_to_lane:
+                check_hit(snes_button_to_lane[event.button])
 
     # draw methods here
     draw_board()
     draw_notes()
 
-    # update gui
-    pygame.display.update()
-    # Framerate 60 fps
-    clock.tick(60)
+    pygame.display.update() # display update
+    clock.tick(60) # 60fps
