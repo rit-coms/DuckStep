@@ -24,7 +24,8 @@ playerX_change, playerY_change = 0, 0
 
 # Placeholder for notes (lane_num, y_position); gonna make csv later
 notes = [
-    [0, 100], [1, 200], [2, 300], [3, 400], [4, 500], [5, 600]
+    [i % 6, -NOTE_HEIGHT * i*5] for i in range(50)
+    # [0, 100], [1, 200], [2, 300], [3, 400], [4, 500], [5, 600]
 ]
 
 # def draw methods to draw stuff on to the screen
