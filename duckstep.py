@@ -15,6 +15,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # (lane config)
 LANE_WIDTH = SCREEN_WIDTH // 6
 NOTE_HEIGHT = 20
+# Load bread note image
+bread_image = pygame.image.load("bread.png")
+bread_image = pygame.transform.scale(bread_image, (LANE_WIDTH - 20, NOTE_HEIGHT))
 # (player variables)
 playerX, playerY = 400, 300  # Initial player position
 playerX_change, playerY_change = 0, 0
@@ -34,7 +37,7 @@ def draw_notes():
     """Draws falling notes on the screen."""
     for note in notes:
         lane, y_pos = note
-        pygame.draw.rect(screen, (255, 0, 0), (lane * LANE_WIDTH + 10, y_pos, LANE_WIDTH - 20, NOTE_HEIGHT))
+        screen.blit(bread_image, (lane * LANE_WIDTH + 10, y_pos))
         note[1] += 5  # Move notes downward
 
 # game go brr
@@ -77,7 +80,7 @@ while running:
 
         # D-pad Controls (Goofy setup)
         if event.type == pygame.JOYAXISMOTION:
-            print(event)
+            print("goofy", event)
             if event.axis == 0:  # Left/Right movement
                 if event.value < -0.5:
                     playerX_change = -5
