@@ -89,6 +89,12 @@ def draw_notes():
     # remove notes that go off the screen
     notes[:] = [note for note in notes if note[1] < SCREEN_HEIGHT - MARGIN + NOTE_HEIGHT]
 
+# show score
+def draw_score():
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(score_text, (SCREEN_WIDTH - 150, 20))
+
 def check_hit(lane):
     """Checks if there is a note in the hit zone for the given lane."""
     global notes, score
@@ -122,6 +128,7 @@ while running:
     # draw methods here
     draw_board()
     draw_notes()
+    draw_score()
 
     pygame.display.update() # display update
     clock.tick(60) # 60fps
