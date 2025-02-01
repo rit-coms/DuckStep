@@ -69,7 +69,7 @@ def draw_notes():
     """Draws falling notes on the screen."""
     global notes
     for note in notes:
-        lane, y_pos, missed = note[0], note[1], note[2]
+        lane, y_pos = note[0], note[1]
         screen.blit(bread_image, (lane * LANE_WIDTH + 10, y_pos))
     # move notes down
     for i in range(len(notes)):
