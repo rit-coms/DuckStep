@@ -14,6 +14,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # (lane config)
 LANE_WIDTH = SCREEN_WIDTH // 6
 NOTE_HEIGHT = 20
+HIT_ZONE_Y = SCREEN_HEIGHT - 100  # Bottom 100 pixels as the hit zone
+HIT_ZONE_HEIGHT = 100  # Height of the hit detection area
+HIT_BUFFER = 50  # Allow hitting notes 50 pixels above the hit zone
 # Load bread note image
 bread_image = pygame.image.load("bread.png")
 bread_image = pygame.transform.scale(bread_image, (LANE_WIDTH - 20, NOTE_HEIGHT))
@@ -23,9 +26,9 @@ playerX_change, playerY_change = 0, 0
 
 # Placeholder for notes (lane_num, y_position); gonna make csv later
 notes = [
-    # [i % 6, -NOTE_HEIGHT * i*5] for i in range(50)
-    [0, -100], [1, -200], [2, -300], [3, -400], [4, -500], [5, -600],
-    [0, -700], [1, -800], [2, -900], [3, -1000], [4, -1100], [5, -1200]
+    [i % 6, -NOTE_HEIGHT * i*10] for i in range(50)
+    # [0, -100], [1, -300], [2, -500], [3, -700], [4, -900], [5, -1100],
+    # [0, -700], [1, -800], [2, -900], [3, -1000], [4, -1100], [5, -1200]
 ]
 score = 0
 
@@ -54,6 +57,8 @@ def draw_board():
     """Draws the six lanes on the screen."""
     for i in range(1, 6):
         pygame.draw.line(screen, (255, 255, 255), (i * LANE_WIDTH, 0), (i * LANE_WIDTH, SCREEN_HEIGHT), 2)
+    # hit notes here:
+    pygame.draw.rect(screen, (100, 100, 100), (0, HIT_ZONE_Y, SCREEN_WIDTH, 100))
 
 def draw_notes():
     """Draws falling notes on the screen."""
@@ -68,11 +73,11 @@ def draw_notes():
     notes = [note for note in notes if note[1] < SCREEN_HEIGHT]
 
 def check_hit(lane):
-    """Checks if there is a note at the bottom of the screen in the given lane."""
+    """Checks if there is a note in the hit zone for the given lane."""
     global notes, score
-    for note in notes:
-        if note[0] == lane and SCREEN_HEIGHT - NOTE_HEIGHT - 5 <= note[1] <= SCREEN_HEIGHT:
-            notes.remove(note)
+    for note in notes[:]:  # Iterate over a copy of the list
+        if note[0] == lane and (HIT_ZONE_Y - HIT_BUFFER) <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT:
+            notes.remove(note)  # Remove note safely
             score += 1
             print(f"Score: {score}")
             return
