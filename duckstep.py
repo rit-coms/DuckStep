@@ -66,7 +66,8 @@ def draw_board():
     """Draws the six lanes on the screen."""
     for i in range(6):
         x_pos = MARGIN + i * LANE_WIDTH
-        pygame.draw.rect(screen, (50, 60, 70), (x_pos, MARGIN, LANE_WIDTH, HIT_ZONE_Y - MARGIN))
+        lane_color = (50, 60, 70) if i < 3 else (70, 60, 50)  # left vs right lanes
+        pygame.draw.rect(screen, lane_color, (x_pos, MARGIN, LANE_WIDTH, HIT_ZONE_Y - MARGIN))
         if missed_lanes[i] > 0:
             pygame.draw.rect(screen, (205, 100, 100), (x_pos, MARGIN, LANE_WIDTH, HIT_ZONE_Y - MARGIN))  # Missed lane effect
         pygame.draw.line(screen, (255, 255, 255), (x_pos, MARGIN), (x_pos, SCREEN_HEIGHT - MARGIN), 2)
