@@ -21,7 +21,7 @@ HIT_ZONE_HEIGHT = 100  # Height of the hit detection area
 HIT_BUFFER = 50  # Allow hitting notes 50 pixels above the hit zone
 # Load bread note image
 bread_image = pygame.image.load("bread.png")
-bread_image = pygame.transform.scale(bread_image, (LANE_WIDTH - 20, NOTE_HEIGHT))
+bread_image = pygame.transform.scale(bread_image, (LANE_WIDTH - 20, NOTE_HEIGHT+20))
 
 # Placeholder for notes (lane_num, y_position); gonna make csv later
 notes = [
