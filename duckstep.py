@@ -1,4 +1,5 @@
 import pygame
+import random
 
 pygame.init() # init pygame
 pygame.joystick.init() #interact w controller
@@ -26,7 +27,7 @@ playerX_change, playerY_change = 0, 0
 
 # Placeholder for notes (lane_num, y_position); gonna make csv later
 notes = [
-    [i % 6, -NOTE_HEIGHT * i*5, False, 0] for i in range(50)
+    [random.randint(0,5), -NOTE_HEIGHT * i*5, False, 0] for i in range(50)
     # [0, -100], [1, -300], [2, -500], [3, -700], [4, -900], [5, -1100],
     # [0, -700], [1, -800], [2, -900], [3, -1000], [4, -1100], [5, -1200]
 ]
