@@ -13,9 +13,10 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # constants go here 
 # (lane config)
-LANE_WIDTH = SCREEN_WIDTH // 6
+MARGIN = 50 # so that theres a border
+LANE_WIDTH = (SCREEN_WIDTH - 2 * MARGIN) // 6
 NOTE_HEIGHT = 20
-HIT_ZONE_Y = SCREEN_HEIGHT - 100  # Bottom 100 pixels as the hit zone
+HIT_ZONE_Y = SCREEN_HEIGHT - MARGIN - 100  # Bottom 100 pixels as the hit zone
 HIT_ZONE_HEIGHT = 100  # Height of the hit detection area
 HIT_BUFFER = 50  # Allow hitting notes 50 pixels above the hit zone
 # Load bread note image
@@ -58,28 +59,35 @@ missed_lanes = {i: 0 for i in range(6)}  # tracks how long lane was red
 
 # def draw methods to draw stuff on to the screen
 def draw_board():
+    # border for screen
+    pygame.draw.rect(screen, (0, 0, 0), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
     # hit notes here:
-    pygame.draw.rect(screen, (100, 100, 100), (0, HIT_ZONE_Y, SCREEN_WIDTH, 100))
+    pygame.draw.rect(screen, (100, 100, 100), (MARGIN, HIT_ZONE_Y, SCREEN_WIDTH - 2 * MARGIN, HIT_ZONE_HEIGHT))
     """Draws the six lanes on the screen."""
     for i in range(6):
+        x_pos = MARGIN + i * LANE_WIDTH
+        pygame.draw.rect(screen, (50, 60, 70), (x_pos, MARGIN, LANE_WIDTH, HIT_ZONE_Y - MARGIN))
         if missed_lanes[i] > 0:
-            pygame.draw.rect(screen, (205, 100, 100), (i * LANE_WIDTH, 0, LANE_WIDTH, HIT_ZONE_Y))  # Full lane fill
-        pygame.draw.line(screen, (255, 255, 255), (i * LANE_WIDTH, 0), (i * LANE_WIDTH, SCREEN_HEIGHT), 2)
+            pygame.draw.rect(screen, (205, 100, 100), (x_pos, MARGIN, LANE_WIDTH, HIT_ZONE_Y - MARGIN))  # Missed lane effect
+        pygame.draw.line(screen, (255, 255, 255), (x_pos, MARGIN), (x_pos, SCREEN_HEIGHT - MARGIN), 2)
+    # Draw rightmost white line for the last lane
+    pygame.draw.line(screen, (255, 255, 255), (MARGIN + 6 * LANE_WIDTH, MARGIN), (MARGIN + 6 * LANE_WIDTH, SCREEN_HEIGHT - MARGIN), 2)
 
 def draw_notes():
     """Draws falling notes on the screen."""
     global notes
     for note in notes:
         lane, y_pos = note[0], note[1]
-        screen.blit(bread_image, (lane * LANE_WIDTH + 10, y_pos))
+        x_pos = MARGIN + lane * LANE_WIDTH + 10
+        screen.blit(bread_image, (x_pos, y_pos))
     # move notes down
     for i in range(len(notes)):
         notes[i][1] += 5  # Move notes downward
-        if notes[i][1] >= SCREEN_HEIGHT and not notes[i][2]:  # mark missed if not already marked
+        if notes[i][1] >= SCREEN_HEIGHT - MARGIN and not notes[i][2]:  # mark missed if not already marked
             notes[i][2] = True
             missed_lanes[notes[i][0]] = 10  # turn the lane red for 10 frames
     # remove notes that go off the screen
-    notes[:] = [note for note in notes if note[1] < SCREEN_HEIGHT + NOTE_HEIGHT]
+    notes[:] = [note for note in notes if note[1] < SCREEN_HEIGHT - MARGIN + NOTE_HEIGHT]
 
 def check_hit(lane):
     """Checks if there is a note in the hit zone for the given lane."""
@@ -99,16 +107,12 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False # exit game
-
         # Keyboard controls for hitting notes
-        if event.type == pygame.KEYDOWN:
-            if event.key in key_to_lane:
-                check_hit(key_to_lane[event.key])
-
+        if event.type == pygame.KEYDOWN and event.key in key_to_lane:
+            check_hit(key_to_lane[event.key])
         # SNES controller button press handling
-        if event.type == pygame.JOYBUTTONDOWN:
-            if event.button in snes_button_to_lane:
-                check_hit(snes_button_to_lane[event.button])
+        if event.type == pygame.JOYBUTTONDOWN and event.button in snes_button_to_lane:
+            check_hit(snes_button_to_lane[event.button])
 
     # Update missed lanes
     for lane in missed_lanes:
