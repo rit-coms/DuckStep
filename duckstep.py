@@ -54,6 +54,11 @@ snes_button_to_lane = {
 # tracking missed lanes and red tint duration
 missed_lanes = {i: 0 for i in range(6)}  # tracks how long lane was red
 
+# feedback message so player knows if note hit
+feedback_message = ""
+feedback_color = (255, 255, 255)
+feedback_timer = 0  # Countdown to clear the message
+
 # def draw methods to draw stuff on to the screen
 def draw_board():
     # border for screen
@@ -73,7 +78,7 @@ def draw_board():
 
 def draw_notes():
     """Draws falling notes on the screen."""
-    global notes
+    global notes, feedback_message, feedback_color, feedback_timer
     for note in notes:
         lane, y_pos = note[0], note[1]
         x_pos = MARGIN + lane * LANE_WIDTH + 10
@@ -84,6 +89,9 @@ def draw_notes():
         if notes[i][1] >= SCREEN_HEIGHT - MARGIN and not notes[i][2]:  # mark missed if not already marked
             notes[i][2] = True
             missed_lanes[notes[i][0]] = 10  # turn the lane red for 10 frames
+            feedback_message = "Missed"
+            feedback_color = (255, 0, 0)
+            feedback_timer = 30  # Display for half a second
     # remove notes that go off the screen
     notes[:] = [note for note in notes if note[1] < SCREEN_HEIGHT - MARGIN + NOTE_HEIGHT]
 
@@ -93,15 +101,35 @@ def draw_score():
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (SCREEN_WIDTH - 150, 20))
 
+# show feedback message
+def draw_feedback():
+    global feedback_timer, feedback_message
+    if feedback_timer > 0:
+        font = pygame.font.Font(None, 48)
+        text = font.render(feedback_message, True, feedback_color)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 30))
+        screen.blit(text, text_rect)
+        feedback_timer -= 1
+    else:
+        feedback_message = ""
+
 def check_hit(lane):
     """Checks if there is a note in the hit zone for the given lane."""
-    global notes, score
+    global notes, score, feedback_message, feedback_color, feedback_timer
     for note in notes[:]:  # Iterate over a copy of the list
-        if note[0] == lane and (HIT_ZONE_Y - HIT_BUFFER) <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT:
-            notes.remove(note)  # Remove note safely
-            score += 1
-            print(f"Score: {score}")
-            return
+        if note[0] == lane:
+            if HIT_ZONE_Y - HIT_BUFFER <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT:
+                notes.remove(note)
+                if HIT_ZONE_Y <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT - HIT_BUFFER:
+                    feedback_message = "Perfect"
+                    feedback_color = (0, 0, 255)
+                    score += 2
+                else:
+                    feedback_message = "Good"
+                    feedback_color = (0, 255, 0)
+                    score += 1
+                feedback_timer = 30  # Display for half a second
+                return
 
 # game go brr
 running = True # infinite loop
@@ -127,6 +155,7 @@ while running:
     draw_board()
     draw_notes()
     draw_score()
+    draw_feedback()
 
     pygame.display.update() # display update
     clock.tick(60) # 60fps

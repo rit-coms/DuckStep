@@ -21,3 +21,6 @@ notes:
 implementation:
     - at the moment: hard-coded list (terrible ik)
     - future: csv import file song_name.csv
+
+score
+- missed (0 points), good (1 point), perfect (3 points)
