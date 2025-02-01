@@ -1,13 +1,23 @@
 6 lanes
 
 lane buttons (in order): 
-Left_Left Left_down Left_right Y B A
-(this is left/right buttons w/out top most button)
+- SNES Controller
+    - Dpad_left Dpad_down Dpad_right Y B A
+    - (this is Dpad and letter buttons w/out top most button)
+- Keyboard
+    - s d f j k l
+        - basically home-row keys on keyboard
 
 logistical buttons
 pause - upper left and upper right (?)
 menu options - left+right upper buttons (?)
 
 notes:
-csv?
-[ lane_num, note_height, ]
+[ lane_num(int), y_pos(int), missed(bool) ]
+    - lane_num: which lane is the note on (0-5)
+    - y_pos: the y coordinate so that note can fall
+    - missed: whether or not a note has been missed
+        - allows for lane to change color if missed
+implementation:
+    - at the moment: hard-coded list (terrible ik)
+    - future: csv import file song_name.csv
