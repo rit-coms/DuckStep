@@ -4,6 +4,17 @@ import random
 pygame.init() # init pygame
 pygame.joystick.init() #interact w controller
 
+# Check if a joystick is connected
+joystick = None
+if pygame.joystick.get_count() > 0:
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+    print("joystick")
+
+# add sound
+pygame.mixer.init() # init sound
+quack_sound = pygame.mixer.Sound("quack.mp3") # load sound
+
 # Game clock for framerate
 clock = pygame.time.Clock()
 
@@ -120,6 +131,7 @@ def check_hit(lane):
         if note[0] == lane:
             if HIT_ZONE_Y - HIT_BUFFER <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT:
                 notes.remove(note)
+                quack_sound.play()
                 if HIT_ZONE_Y <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT - HIT_BUFFER:
                     feedback_message = "Perfect"
                     feedback_color = (0, 0, 255)
@@ -143,7 +155,7 @@ while running:
         if event.type == pygame.KEYDOWN and event.key in key_to_lane:
             check_hit(key_to_lane[event.key])
         # SNES controller button press handling
-        if event.type == pygame.JOYBUTTONDOWN and event.button in snes_button_to_lane:
+        if (joystick == pygame.JOYBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and event.button in snes_button_to_lane:
             check_hit(snes_button_to_lane[event.button])
 
     # Update missed lanes
