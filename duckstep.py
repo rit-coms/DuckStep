@@ -3,6 +3,7 @@ import random
 
 pygame.init() # init pygame
 pygame.joystick.init() #interact w controller
+pygame.mixer.init() # init sound
 
 # Check if a joystick is connected
 joystick = None
@@ -11,9 +12,13 @@ if pygame.joystick.get_count() > 0:
     joystick.init()
     print("joystick")
 
-# add sound
-pygame.mixer.init() # init sound
-quack_sound = pygame.mixer.Sound("quack.mp3") # load sound
+# sound stuff
+quack1 = pygame.mixer.Sound("quack1.mp3") # load sound
+quack2 = pygame.mixer.Sound("quack2.mp3") # load sound
+quack3 = pygame.mixer.Sound("quack3.mp3") # load sound
+quack4 = pygame.mixer.Sound("quack4.mp3") # load sound
+quack5 = pygame.mixer.Sound("quack5.mp3") # load sound
+quack6 = pygame.mixer.Sound("quack6.mp3") # load sound
 
 # Game clock for framerate
 clock = pygame.time.Clock()
@@ -60,6 +65,16 @@ snes_button_to_lane = {
     3: 3, # Y button
     1: 4, # B button
     0: 5, # A button
+}
+
+# play correct quack
+lane_to_quack = {
+    0: quack1,
+    1: quack2,
+    2: quack3,
+    3: quack4,
+    4: quack5,
+    5: quack6
 }
 
 # tracking missed lanes and red tint duration
@@ -131,7 +146,7 @@ def check_hit(lane):
         if note[0] == lane:
             if HIT_ZONE_Y - HIT_BUFFER <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT:
                 notes.remove(note)
-                quack_sound.play()
+                lane_to_quack[lane].play()
                 if HIT_ZONE_Y <= note[1] <= HIT_ZONE_Y + HIT_ZONE_HEIGHT - HIT_BUFFER:
                     feedback_message = "Perfect"
                     feedback_color = (0, 0, 255)
