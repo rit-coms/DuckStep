@@ -13,12 +13,12 @@ if pygame.joystick.get_count() > 0:
     print("joystick")
 
 # sound stuff
-quack1 = pygame.mixer.Sound("quack1.mp3") # load sound
-quack2 = pygame.mixer.Sound("quack2.mp3") # load sound
-quack3 = pygame.mixer.Sound("quack3.mp3") # load sound
-quack4 = pygame.mixer.Sound("quack4.mp3") # load sound
-quack5 = pygame.mixer.Sound("quack5.mp3") # load sound
-quack6 = pygame.mixer.Sound("quack6.mp3") # load sound
+quack1 = pygame.mixer.Sound("quack/quack1.mp3") # load sound
+quack2 = pygame.mixer.Sound("quack/quack2.mp3") # load sound
+quack3 = pygame.mixer.Sound("quack/quack3.mp3") # load sound
+quack4 = pygame.mixer.Sound("quack/quack4.mp3") # load sound
+quack5 = pygame.mixer.Sound("quack/quack5.mp3") # load sound
+quack6 = pygame.mixer.Sound("quack/quack6.mp3") # load sound
 
 # Game clock for framerate
 clock = pygame.time.Clock()
