@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 
 # color variables
 COLOR_BLACK = (0, 0, 0)
@@ -187,6 +188,8 @@ while running:
         # Keyboard controls for hitting notes
         if event.type == pygame.KEYDOWN and event.key in key_to_lane:
             check_hit(key_to_lane[event.key])
+            if event.key == pygame.K_ESCAPE:
+                sys.exit()
         # SNES controller button press handling
         if (joystick == pygame.JOYBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and event.button in snes_button_to_lane:
             check_hit(snes_button_to_lane[event.button])
