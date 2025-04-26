@@ -188,7 +188,10 @@ while running:
         # Keyboard controls for hitting notes
         if event.type == pygame.KEYDOWN and event.key in key_to_lane:
             check_hit(key_to_lane[event.key])
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                print("Exiting game...")
+                running = False
                 sys.exit()
         # SNES controller button press handling
         if (joystick == pygame.JOYBUTTONDOWN or event.type == pygame.JOYBUTTONDOWN) and event.button in snes_button_to_lane:
